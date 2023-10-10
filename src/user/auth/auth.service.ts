@@ -1,5 +1,9 @@
-import { Injectable, ConflictException } from '@nestjs/common';
-import { SignupDto } from './dtos/auth.dto';
+import {
+  Injectable,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
+import { SigninDto, SignupDto } from './dtos/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
@@ -37,7 +41,25 @@ export class AuthService {
     return { token };
   }
 
-  signin() {
-    return 'Logged in';
+  async signin(body: SigninDto) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email: body.email },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Email not registered');
+    }
+
+    const passwordMatch = await bcrypt.compare(body.password, user.password);
+
+    if (!passwordMatch) {
+      throw new BadRequestException('Wrong password');
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+    );
+    return { token };
   }
 }
