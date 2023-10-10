@@ -2,6 +2,7 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { SignupDto } from './dtos/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 import { UserType } from '@prisma/client';
 
 @Injectable()
@@ -28,9 +29,12 @@ export class AuthService {
       },
     });
 
-    delete newUser.password;
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email },
+      process.env.JWT_SECRET,
+    );
 
-    return newUser;
+    return { token };
   }
 
   signin() {
