@@ -13,7 +13,7 @@ import { UserType } from '@prisma/client';
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async signup(body: SignupDto) {
+  async signup(body: SignupDto, userType: UserType) {
     const alreadyRegistered = await this.prismaService.user.findUnique({
       where: { email: body.email },
     });
@@ -29,7 +29,7 @@ export class AuthService {
         name: body.name,
         email: body.email,
         password: hashPassword,
-        user_type: UserType.BUYER,
+        user_type: userType,
       },
     });
 
@@ -61,5 +61,12 @@ export class AuthService {
       process.env.JWT_SECRET,
     );
     return { token };
+  }
+
+  async generateProductKey(email: string, user_type: UserType) {
+    const string = `${email}-${user_type}-${process.env.PRODUCT_KEY_SECRET}`;
+
+    const productKey = await bcrypt.hash(string, 10);
+    return { productKey };
   }
 }
