@@ -46,7 +46,6 @@ export class HomeService {
   }
 
   async createHome(body: CreateHomeDto) {
-    console.log(body);
     const home = await this.prismaService.home.create({
       data: {
         address: body.address,
@@ -59,6 +58,15 @@ export class HomeService {
         user_id: +9,
       },
     });
+
+    const homeImages = body.images.map((image) => {
+      return { ...image, home_id: home.id };
+    });
+
+    await this.prismaService.image.createMany({
+      data: homeImages,
+    });
+
     return home;
   }
 

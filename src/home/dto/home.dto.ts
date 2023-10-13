@@ -1,5 +1,17 @@
-import { Image } from '@prisma/client';
-import { IsNotEmpty, IsOptional, IsPositive, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsPositive,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+
+class Image {
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+}
 
 export class CreateHomeDto {
   @IsNotEmpty()
@@ -23,6 +35,8 @@ export class CreateHomeDto {
   @IsPositive()
   land_size: number;
 
-  @IsOptional()
-  images?: Image[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Image)
+  images: Image[];
 }
