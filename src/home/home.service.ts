@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateHomeDto } from './dto/home.dto';
+import { CreateHomeDto, UpdateHomeDto } from './dto/home.dto';
 import { PropertyType } from '@prisma/client';
 
 interface filterType {
@@ -35,7 +35,7 @@ export class HomeService {
     return homes;
   }
 
-  async getHomeById(id: string) {
+  async getHomeById(id: number) {
     const home = await this.prismaService.home.findUnique({
       where: { id: +id },
     });
@@ -70,11 +70,36 @@ export class HomeService {
     return home;
   }
 
-  async updateHome(id: string) {
-    return 'update a home';
+  async updateHome(id: number, body: UpdateHomeDto) {
+    const home = await this.prismaService.home.findUnique({ where: { id } });
+
+    if (!home) {
+      throw new NotFoundException();
+    }
+
+    const updatedHome = this.prismaService.home.update({
+      where: { id },
+      data: body,
+    });
+
+    return updatedHome;
   }
 
-  async deleteHome(id: string) {
-    return 'Delete Home';
+  async deleteHome(id: number) {
+    const home = await this.prismaService.home.findUnique({ where: { id } });
+    if (!home) {
+      throw new NotFoundException();
+    }
+
+    // First delete the asociated images
+    await this.prismaService.image.deleteMany({
+      where: { home_id: id },
+    });
+    // Then delete the home
+    const deletedHome = await this.prismaService.home.delete({
+      where: { id },
+    });
+
+    return deletedHome;
   }
 }
