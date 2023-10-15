@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateHomeDto, UpdateHomeDto } from './dto/home.dto';
 import { PropertyType } from '@prisma/client';
@@ -71,11 +75,16 @@ export class HomeService {
     return home;
   }
 
-  async updateHome(id: number, body: UpdateHomeDto) {
+  async updateHome(id: number, body: UpdateHomeDto, user: UserInfoJwt) {
     const home = await this.prismaService.home.findUnique({ where: { id } });
 
     if (!home) {
       throw new NotFoundException();
+    }
+
+    // Check ownership of home item
+    if (home.user_id !== user.id) {
+      throw new ForbiddenException();
     }
 
     const updatedHome = this.prismaService.home.update({
@@ -86,10 +95,15 @@ export class HomeService {
     return updatedHome;
   }
 
-  async deleteHome(id: number) {
+  async deleteHome(id: number, user: UserInfoJwt) {
     const home = await this.prismaService.home.findUnique({ where: { id } });
     if (!home) {
       throw new NotFoundException();
+    }
+
+    // Check ownership of home item
+    if (home.user_id !== user.id) {
+      throw new ForbiddenException();
     }
 
     // First delete the asociated images

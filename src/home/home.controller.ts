@@ -58,12 +58,14 @@ export class HomeController {
   updateHome(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateHomeDto,
+    @User() user: UserInfoJwt,
   ) {
-    return this.homeService.updateHome(id, body);
+    console.log(user);
+    return this.homeService.updateHome(id, body, user);
   }
 
   @Delete(':id')
-  deleteHome(@Param('id', ParseIntPipe) id: number) {
-    return this.homeService.deleteHome(id);
+  deleteHome(@Param('id', ParseIntPipe) id: number, @User() user: UserInfoJwt) {
+    return this.homeService.deleteHome(id, user);
   }
 }
