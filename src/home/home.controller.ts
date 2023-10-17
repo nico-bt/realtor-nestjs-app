@@ -11,8 +11,9 @@ import {
 } from '@nestjs/common';
 import { HomeService } from './home.service';
 import { CreateHomeDto, UpdateHomeDto } from './dto/home.dto';
-import { PropertyType } from '@prisma/client';
+import { PropertyType, UserType } from '@prisma/client';
 import { User, UserInfoJwt } from 'src/user/decorators/user.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('home')
 export class HomeController {
@@ -49,21 +50,23 @@ export class HomeController {
     return this.homeService.getHomeById(id);
   }
 
+  @Roles(UserType.BUYER, UserType.REALTOR)
   @Post()
   createHome(@Body() body: CreateHomeDto, @User() user: UserInfoJwt) {
     return this.homeService.createHome(body, user);
   }
 
+  @Roles(UserType.BUYER, UserType.REALTOR)
   @Put(':id')
   updateHome(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateHomeDto,
     @User() user: UserInfoJwt,
   ) {
-    console.log(user);
     return this.homeService.updateHome(id, body, user);
   }
 
+  @Roles(UserType.BUYER, UserType.REALTOR)
   @Delete(':id')
   deleteHome(@Param('id', ParseIntPipe) id: number, @User() user: UserInfoJwt) {
     return this.homeService.deleteHome(id, user);
