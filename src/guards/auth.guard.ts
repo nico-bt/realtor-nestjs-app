@@ -23,7 +23,6 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    console.log(roles);
 
     if (!roles || roles.length === 0) {
       // No need of authorization if no roles are provided in the Roles decorator. Access granted
