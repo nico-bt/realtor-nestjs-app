@@ -10,7 +10,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { HomeService } from './home.service';
-import { CreateHomeDto, UpdateHomeDto } from './dto/home.dto';
+import { CreateHomeDto, InquireDto, UpdateHomeDto } from './dto/home.dto';
 import { PropertyType, UserType } from '@prisma/client';
 import { User, UserInfoJwt } from 'src/user/decorators/user.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -70,5 +70,26 @@ export class HomeController {
   @Delete(':id')
   deleteHome(@Param('id', ParseIntPipe) id: number, @User() user: UserInfoJwt) {
     return this.homeService.deleteHome(id, user);
+  }
+
+  @Roles(UserType.BUYER, UserType.REALTOR)
+  @Post('/:id/inquire')
+  inquire(
+    @Param('id', ParseIntPipe) homeId: number,
+    @Body() { message }: InquireDto,
+    @User() user: UserInfoJwt,
+  ) {
+    return this.homeService.inquire(homeId, message, user.id);
+  }
+
+  @Roles(UserType.BUYER, UserType.REALTOR)
+  @Get('/:id/inquire')
+  getMessagesByHomeId(
+    @Param('id', ParseIntPipe) homeId: number,
+    @User() user: UserInfoJwt,
+  ) {
+    // Could check the user's home ownership here
+
+    return this.homeService.getMessagesByHomeId(homeId);
   }
 }

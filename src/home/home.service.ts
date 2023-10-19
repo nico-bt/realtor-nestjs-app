@@ -117,4 +117,36 @@ export class HomeService {
 
     return deletedHome;
   }
+
+  async inquire(homeId: number, message: string, userId: number) {
+    const home = await this.prismaService.home.findUnique({
+      where: { id: homeId },
+    });
+
+    if (!home) {
+      throw new NotFoundException('Not Found. Verify the home id');
+    }
+
+    const newMessage = await this.prismaService.message.create({
+      data: {
+        message,
+        realtor_id: home.user_id,
+        buyer_id: userId,
+        home_id: homeId,
+      },
+    });
+    return newMessage;
+  }
+
+  async getMessagesByHomeId(homeId: number) {
+    const messages = await this.prismaService.message.findMany({
+      where: { home_id: homeId },
+      select: {
+        message: true,
+        home: { select: { id: true, address: true } },
+        buyer: { select: { email: true, name: true, phone: true } },
+      },
+    });
+    return messages;
+  }
 }
