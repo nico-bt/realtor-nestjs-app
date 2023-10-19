@@ -39,6 +39,7 @@ model Home {
   images              Image[]
   user_id             Int
   user                User @relation(fields: [user_id], references: [id])
+  messages            Message[]
 }
 
 model Image {
@@ -58,6 +59,8 @@ model Message {
   realtor     User @relation("realtor_messages", fields: [realtor_id], references: [id])
   buyer_id    Int
   buyer       User @relation("buyer_messages", fields: [buyer_id], references: [id])
+  home_id     Int
+  home        Home @relation(fields: [home_id],references: [id])
 }
 
 enum PropertyType {
