@@ -1,4 +1,5 @@
 import { UserType } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger/dist';
 import {
   IsString,
   IsNotEmpty,
@@ -29,6 +30,7 @@ export class SignupDto {
   @MinLength(5)
   password: string;
 
+  @ApiProperty({ description: 'To sign up as REALTOR you need a product key' })
   @IsOptional()
   @IsString()
   productKey?: string;
@@ -52,4 +54,17 @@ export class GenerateProductKeyDto {
   @IsNotEmpty()
   @IsEnum(UserType)
   user_type: UserType;
+}
+
+export class AuthResponseDto {
+  token: string;
+}
+export class ProdKeyResponseDto {
+  productKey: string;
+}
+
+export class MeResponseDto {
+  id: number;
+  email: string;
+  iat: number;
 }

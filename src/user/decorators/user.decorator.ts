@@ -2,7 +2,8 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export interface UserInfoJwt {
   id: number;
-  mail: string;
+  email: string;
+  iat: number;
 }
 
 export const User = createParamDecorator((data, context: ExecutionContext) => {

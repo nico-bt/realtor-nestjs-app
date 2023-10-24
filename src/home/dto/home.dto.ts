@@ -1,3 +1,4 @@
+import { Message, PrismaPromise, PropertyType } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -7,6 +8,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger/dist/decorators';
 
 class Image {
   @IsString()
@@ -70,4 +72,51 @@ export class InquireDto {
   @IsNotEmpty()
   @IsString()
   message: string;
+}
+
+export class ImageDtoInHome {
+  url: string;
+}
+
+export class HomeResponseDto {
+  id: number;
+  address: string;
+  number_of_bedrooms: number;
+  number_of_bathrooms: number;
+  city: string;
+  listed_date: Date;
+  price: number;
+  land_size: number;
+
+  @ApiProperty({ enum: [PropertyType.CONDO, PropertyType.RESIDENTIAL] })
+  propertyType: PropertyType;
+
+  user: { email: string; name: string };
+
+  // Add ApiProperty decorator to avoid circular dep error from swagger
+  @ApiProperty({ type: ImageDtoInHome, isArray: true })
+  images: {
+    url: string;
+  }[];
+}
+
+export class MessageResponseDto {
+  id: number;
+  message: string;
+  realtor_id: number;
+  buyer_id: number;
+  home_id: number;
+}
+
+export class MessagesByHomeResponseDto {
+  home: {
+    id: number;
+    address: string;
+  };
+  message: string;
+  buyer: {
+    name: string;
+    phone: string;
+    email: string;
+  };
 }

@@ -10,11 +10,18 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { HomeService } from './home.service';
-import { CreateHomeDto, InquireDto, UpdateHomeDto } from './dto/home.dto';
-import { PropertyType, UserType } from '@prisma/client';
+import {
+  CreateHomeDto,
+  HomeResponseDto,
+  InquireDto,
+  UpdateHomeDto,
+} from './dto/home.dto';
+import { Home, PropertyType, UserType } from '@prisma/client';
 import { User, UserInfoJwt } from 'src/user/decorators/user.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Homes')
 @Controller('home')
 export class HomeController {
   constructor(private readonly homeService: HomeService) {}
@@ -46,7 +53,7 @@ export class HomeController {
   }
 
   @Get(':id')
-  getHomeById(@Param('id', ParseIntPipe) id: number) {
+  getHomeById(@Param('id', ParseIntPipe) id: number): Promise<HomeResponseDto> {
     return this.homeService.getHomeById(id);
   }
 
